@@ -1,0 +1,25 @@
+%Schur numbers.
+% 
+% The range of integers to be partitioned is n and the number of parts is k. 
+% The main predicate is inpart. Atom inpart(X,P)
+% represents the fact that number X is included in part P.
+% The idea is to find a partition of integers {1,2,...,n} into k parts
+% such that each part is sum free, i.e. for any X and Y, 
+% X and X+X are in different parts and 
+% if X and Y are in the same part, then X+Y is in a different part.
+
+% Assign each integer to exactly one part. 
+1 { inpart(X,P):part(P) } 1 :- number(X).
+
+% X and X+X cannot be in the same part
+:- number(X),  part(P), inpart(X,P), inpart(X+X,P).
+
+% X, Y, and X+Y cannot be in the same part
+:- number(X;Y), X != Y, part(P), inpart(X,P), inpart(Y,P), inpart((X+Y),P).
+
+
+% Remove some symmetries by taking always the lowest free part
+:- number(X), part(P), inpart(X,P), part(P1), P1 < P, not occupied(X,P1). 
+
+% occupied(X,P) iff there is a number Y < X in P
+occupied(X,P) :- number(X;Y), part(P),  Y < X, inpart(Y,P).
